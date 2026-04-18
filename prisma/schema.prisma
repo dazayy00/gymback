@@ -96,4 +96,5 @@ enum MembershipType {
   WEEKLY
   MONTHLY
   YEARLY
+  DAILY
 }
