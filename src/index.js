@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 
 import userRoutes from "./routes/user.routes.js";
 import membershipRoutes from "./routes/membership.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/memberships", membershipRoutes);
+app.use("/api/products", productRoutes);
 
 app.get("/", (req, res) => {
   res.send("API Gym funcionando 🚀");

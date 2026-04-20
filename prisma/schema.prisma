@@ -81,6 +81,30 @@ model AccessLog {
   createdAt DateTime @default(now())
 }
 
+model Admin {
+  id        Int     @id @default(autoincrement())
+  name      String
+  email     String  @unique
+  password  String
+  role      AdminRole @default(STAFF)
+
+  createdAt DateTime @default(now())
+}
+
+model Gym {
+  id        Int     @id @default(1)
+  name      String
+  logoUrl   String?
+  primaryColor String? @default("#22c55e")
+
+  createdAt DateTime @default(now())
+}
+
+enum AdminRole {
+  SUPERADMIN
+  STAFF
+}
+
 enum UserStatus {
   ACTIVE
   INACTIVE
