@@ -23,8 +23,41 @@ export const getDashboardData = async () => {
         visitorsToday,
     ] = await Promise.all([
         prisma.sale.aggregate({
-            _sum: {total: true},
-            where: {}
-        })
-    ])
-}
+            _sum: { total: true },
+            where: {
+                createdAt: { gte: startOfDay },
+            },
+        }),
+
+        prisma.sale.aggregate({
+            _sum: { total: true },
+            where: {
+                createdAt: { gte: startOfMonth },
+            },
+        }),
+
+        prisma.sale.count(),
+
+        prisma.accessLog.count({
+            where: {
+                success: true,
+                createdAt: { gte: startOfDay },
+            },
+        }),
+
+        prisma.membership.count({
+            where: {
+                type: "DAILY",
+                startDate: { gte: startOfDay },
+            },
+        }),
+    ]);
+
+    return {
+        incomeToday: salesToday._sum.total || 0,
+        incomeMonth: salesMonth._sum.total || 0,
+        totalSales,
+        activeUsersToday,
+        visitorsToday,
+    };
+};

@@ -37,15 +37,19 @@ model Membership {
 }
 
 model Product {
-  id        Int     @id @default(autoincrement())
-  name      String
-  price     Float
-  stock     Int
-  active    Boolean @default(true)
+  id          Int          @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  stock       Int          @default(0)
+  barcode     String?      @unique
+  imageUrl    String?
+  isActive    Boolean      @default(true)
 
-  details   SaleDetail[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
-  createdAt DateTime @default(now())
+  saleDetails SaleDetail[]
 }
 
 model Sale {
