@@ -27,3 +27,11 @@ export const createUserService = async(data) => {
         qrImage,
     };
 };
+
+export const getUsersService = async () => {
+  return await prisma.user.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
