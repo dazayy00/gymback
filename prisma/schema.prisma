@@ -15,6 +15,7 @@ model User {
   email         String?  @unique
   phone         String?
   qrCode        String   @unique
+  imageUrl      String?
   status        UserStatus @default(ACTIVE)
 
   memberships   Membership[]
