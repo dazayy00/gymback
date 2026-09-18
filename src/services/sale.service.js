@@ -1,6 +1,6 @@
 import prisma from "../config/prisma.js";
 
-export const createSaleService = async ({ userId, items }) => {
+export const createSaleService = async ({ userId, adminId, paymentMethod, items }) => {
   if (!items || items.length === 0) {
     throw new Error("No hay productos en la venta");
   }
@@ -36,7 +36,9 @@ export const createSaleService = async ({ userId, items }) => {
     const newSale = await tx.sale.create({
       data: {
         userId,
+        adminId,
         total,
+        paymentMethod,
       },
     });
 
@@ -45,6 +47,7 @@ export const createSaleService = async ({ userId, items }) => {
         saleId: newSale.id,
         productId: item.productId,
         quantity: item.quantity,
+        price: productMap.get(item.productId).price,
       })),
     });
 

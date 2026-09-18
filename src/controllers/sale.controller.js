@@ -3,15 +3,16 @@ import prisma from "../config/prisma.js";
 
 export const createSale = async (req, res) => {
   try {
-    const { userId, items } = req.body;
+    const { userId, items, paymentMethod } = req.body;
+    const adminId = req.admin?.id;
 
-    if (!userId || !items || items.length === 0) {
+    if (!items || items.length === 0) {
       return res.status(400).json({
         message: "Datos incompletos",
       });
     }
 
-    const sale = await createSaleService({ userId, items });
+    const sale = await createSaleService({ userId, adminId, paymentMethod, items });
 
     res.status(201).json({
       message: "Venta registrada",
@@ -28,9 +29,16 @@ export const createSale = async (req, res) => {
 
 export const getSales = async (req, res) => {
   try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
     const sales = await prisma.sale.findMany({
+      skip,
+      take: limit,
       include: {
         user: true,
+        admin: true,
         details: {
           include: {
             product: true,
@@ -42,7 +50,17 @@ export const getSales = async (req, res) => {
       },
     });
 
-    res.json(sales);
+    const total = await prisma.sale.count();
+
+    res.json({
+      data: sales,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error("ERROR GET SALES:", error);
 

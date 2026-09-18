@@ -28,10 +28,16 @@ export const createUserService = async(data) => {
     };
 };
 
-export const getUsersService = async () => {
-  return await prisma.user.findMany({
+export const getUsersService = async ({ skip = 0, take = 50 } = {}) => {
+  const users = await prisma.user.findMany({
+    skip,
+    take,
     orderBy: {
       createdAt: "desc",
     },
   });
+  
+  const total = await prisma.user.count();
+  
+  return { users, total };
 };

@@ -2,6 +2,10 @@ import prisma from "../config/prisma.js";
 
 export const getProducts = async (req, res) => {
   try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
     const products = await prisma.product.findMany({
       where: {
         isActive: true,
@@ -9,9 +13,21 @@ export const getProducts = async (req, res) => {
       orderBy: {
         id: "asc",
       },
+      skip,
+      take: limit,
     });
 
-    res.json(products);
+    const total = await prisma.product.count({ where: { isActive: true } });
+
+    res.json({
+      data: products,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error("ERROR GET PRODUCTS:", error);
 

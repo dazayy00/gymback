@@ -54,11 +54,14 @@ model Product {
 }
 
 model Sale {
-  id        Int      @id @default(autoincrement())
-  userId    Int?
-  total     Float
+  id            Int           @id @default(autoincrement())
+  userId        Int?
+  adminId       Int?
+  total         Float
+  paymentMethod PaymentMethod @default(CASH)
 
-  user      User?    @relation(fields: [userId], references: [id])
+  user          User?         @relation(fields: [userId], references: [id])
+  admin         Admin?        @relation(fields: [adminId], references: [id])
   details   SaleDetail[]
 
   createdAt DateTime @default(now())
@@ -93,7 +96,25 @@ model Admin {
   password  String
   role      AdminRole @default(STAFF)
 
+  sales     Sale[]
+  cashSessionsOpened CashRegisterSession[] @relation("OpenedByAdmin")
+  cashSessionsClosed CashRegisterSession[] @relation("ClosedByAdmin")
+
   createdAt DateTime @default(now())
+}
+
+model CashRegisterSession {
+  id              Int       @id @default(autoincrement())
+  openedAt        DateTime  @default(now())
+  closedAt        DateTime?
+  openedById      Int
+  closedById      Int?
+  startingBalance Float     @default(0)
+  closingBalance  Float?
+  status          CashRegisterStatus @default(OPEN)
+
+  openedBy        Admin     @relation("OpenedByAdmin", fields: [openedById], references: [id])
+  closedBy        Admin?    @relation("ClosedByAdmin", fields: [closedById], references: [id])
 }
 
 model Gym {
@@ -126,4 +147,15 @@ enum MembershipType {
   MONTHLY
   YEARLY
   DAILY
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+}
+
+enum CashRegisterStatus {
+  OPEN
+  CLOSED
 }
